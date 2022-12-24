@@ -46,7 +46,7 @@ def get_account_tags(api_url: str, org_id: str, headers: dict) -> dict:
     return response.json()
 
 
-def get_account_vacancies_statuses(api_url: str, headers: dict, org_id: str) -> dict:
+def get_account_vacancies_statuses(api_url: str, org_id: str, headers: dict) -> dict:
     response = requests.get(f'{api_url}/v2/accounts/{org_id}/vacancies/statuses', headers=headers)
     response.raise_for_status()
 
@@ -60,7 +60,7 @@ def get_accounts(api_url: str, headers: dict) -> dict:
     return response.json()
 
 
-def get_hired_vacancy_status_id(vacancy_statuses: dict) -> int:
+def get_hired_vacancy_status_id(vacancy_statuses: dict):
     hired_status_id = None
     for vacancy_status in vacancy_statuses['items']:
         if 'hired' in vacancy_status.values():
@@ -80,37 +80,19 @@ def find_tag_name_in_account_tags(account_tags: dict, account_tag_name: str):
 
 def main():
     dot_env_path = Path(Path.cwd(), 'config/.env')
-    if not Path.exists(dot_env_path):
-        print('File .env is not loaded')
+    if Path.exists(dot_env_path):
+        load_dotenv(dot_env_path)
 
     load_dotenv(dot_env_path)
+
     hf_token = os.environ['HF_API_TOKEN']
     hf_api_url = os.environ['HF_API_URL']
-    account_id = os.environ['HF_ORG_ACCOUNT_ID']
-    hired_account_status_id = os.environ['HF_HIRED_ACCOUNT_STATUS_ID']
-    tag_name = os.environ['TAG_NAME']
-    tag_color = os.environ['TAG_COLOR']
+    org_id = os.environ['ORG_ID']
     headers = {'Authorization': f'Bearer {hf_token}'}
 
-    vacancy_statuses = get_account_vacancies_statuses(hf_api_url, headers, account_id)
-    pprint(vacancy_statuses)
-    # hired_status_id = get_hired_vacancy_status_id(vacancy_statuses)
-
-    account_tags = get_account_tags(hf_api_url, account_id, headers)
-    # pprint(account_tags)
-
-    account_tags = get_account_tags(hf_api_url, account_id, headers)
-    hired_tag_id = find_tag_name_in_account_tags(account_tags, tag_name)
-    # delete_account_tag(hf_api_url, account_id, hired_tag_id, headers)
-    if not find_tag_name_in_account_tags(account_tags, tag_name):
-        hired_tag_id = create_tag(hf_api_url, account_id, tag_name, tag_color, headers)
-    #
-    print(f'{account_tags=}')
-    # pprint(get_applicant_tags(hf_api_url, account_id, 129, headers))
-
-    # applicant_tags = [76, 76]
-
-    # print(update_applicant_tags(hf_api_url, account_id, 129, applicant_tags, headers))
+    accounts_by_token = get_accounts(hf_api_url, headers)
+    account_vacancy_statuses = get_account_vacancies_statuses(hf_api_url, org_id, headers)
+    hired_status_id = get_hired_vacancy_status_id(account_vacancy_statuses)
 
 
 if __name__ == '__main__':

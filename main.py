@@ -13,8 +13,8 @@ if Path.exists(dot_env_path):
 
 hf_token = os.environ['HF_API_TOKEN']
 hf_api_url = os.environ['HF_API_URL']
-account_id = os.environ['ORG_ACCOUNT_ID']
-hired_account_status_id = int(os.environ['HIRED_ACCOUNT_STATUS_ID'])
+account_id = os.environ['ORG_ID']
+hired_account_status_id = int(os.environ['HIRED_STATUS_ID'])
 tag_name = os.environ['TAG_NAME']
 tag_color = os.environ['TAG_COLOR']
 headers = {'Authorization': f'Bearer {hf_token}'}
