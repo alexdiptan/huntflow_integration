@@ -38,13 +38,13 @@ async def applicant(request: Request):
 
     vacancy_id = hf_body["event"]["vacancy"]["id"]
     created_vacancy_position = hf_body["event"]["vacancy"]["position"]
-    applicants_with_requested_position = api_methods.search_applicants_with_position(hf_api_url, account_id,
-                                                                                     vacancy_position,
-                                                                                     headers)
-    if applicants_with_requested_position['total_items'] == 0:
+    applicant_with_requested_position = api_methods.search_applicants_with_position(hf_api_url, account_id,
+                                                                                    vacancy_position,
+                                                                                    headers)
+    if applicant_with_requested_position['total_items'] == 0:
         return {"status": "ERR: There is no applicant without vacancy or needed position name"}
 
-    applicant_id = applicants_with_requested_position['items'][0]['id']
+    applicant_id = applicant_with_requested_position['items'][0]['id']
 
     if created_vacancy_position != vacancy_position:
         return {"status": "ERR: Vacancy position is not equal applicant position"}

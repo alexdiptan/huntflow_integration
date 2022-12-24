@@ -10,6 +10,7 @@ def add_applicant_to_vacancy(api_url: str, org_id: str, applicant_id: str, vacan
                              headers: dict) -> dict:
     payload = {"vacancy": vacancy_id,
                "status": vacancy_status_id,
+               "count": 1
                }
     response = requests.post(f'{api_url}/v2/accounts/{org_id}/applicants/{applicant_id}/vacancy', headers=headers,
                              json=payload)
@@ -21,6 +22,7 @@ def add_applicant_to_vacancy(api_url: str, org_id: str, applicant_id: str, vacan
 def search_applicants_with_position(api_url: str, org_id: str, applicant_position_name: str, headers: dict) -> dict:
     params = {"q": applicant_position_name,
               "field": "position",
+              "vacancy": "null"
               }
     response = requests.get(f'{api_url}/v2/accounts/{org_id}/applicants/search', headers=headers, params=params)
     response.raise_for_status()
@@ -120,9 +122,10 @@ def main():
     # ---------------------------------------------------------------------------------------------------------------
     applicants_with_requested_position = search_applicants_with_position(hf_api_url, org_id, vacancy_position,
                                                                          headers)
-    if applicants_with_requested_position['total_items'] > 0:
-        applicant_id = applicants_with_requested_position['items'][0]['id']
-        pprint(add_applicant_to_vacancy(hf_api_url, org_id, applicant_id, 163, start_vacancy_status_id, headers))
+    pprint(applicants_with_requested_position)
+    # if applicants_with_requested_position['total_items'] > 0:
+    #     applicant_id = applicants_with_requested_position['items'][0]['id']
+    #     pprint(add_applicant_to_vacancy(hf_api_url, org_id, applicant_id, 163, start_vacancy_status_id, headers))
 
 
 if __name__ == '__main__':
