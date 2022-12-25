@@ -8,19 +8,19 @@ import api_methods
 
 app = FastAPI()
 
-dot_env_path = Path(Path.cwd(), 'config/.env')
+dot_env_path = Path(Path.cwd(), "config/.env")
 if Path.exists(dot_env_path):
     load_dotenv(dot_env_path)
 
-hf_token = os.environ['HF_API_TOKEN']
-hf_api_url = os.environ['HF_API_URL']
-account_id = os.environ['ORG_ID']
-start_vacancy_status_id = os.environ['START_VACANCY_STATUS_ID']
-hired_account_status_id = int(os.environ['HIRED_STATUS_ID'])
-vacancy_position = os.environ['VACANCY_POSITION']
-tag_name = os.environ['TAG_NAME']
-tag_color = os.environ['TAG_COLOR']
-headers = {'Authorization': f'Bearer {hf_token}'}
+hf_token = os.environ["HF_API_TOKEN"]
+hf_api_url = os.environ["HF_API_URL"]
+account_id = os.environ["ORG_ID"]
+start_vacancy_status_id = os.environ["START_VACANCY_STATUS_ID"]
+hired_account_status_id = int(os.environ["HIRED_STATUS_ID"])
+vacancy_position = os.environ["VACANCY_POSITION"]
+tag_name = os.environ["TAG_NAME"]
+tag_color = os.environ["TAG_COLOR"]
+headers = {"Authorization": f"Bearer {hf_token}"}
 
 
 @app.post("/vacancy")
@@ -38,19 +38,27 @@ async def applicant(request: Request):
 
     vacancy_id = hf_body["event"]["vacancy"]["id"]
     created_vacancy_position = hf_body["event"]["vacancy"]["position"]
-    applicant_with_requested_position = api_methods.search_applicants_with_position(hf_api_url, account_id,
-                                                                                    vacancy_position,
-                                                                                    headers)
-    if applicant_with_requested_position['total_items'] == 0:
-        return {"status": "ERR: There is no applicant without vacancy or needed position name"}
+    applicant_with_requested_position = api_methods.search_applicants_with_position(
+        hf_api_url, account_id, vacancy_position, headers
+    )
+    if applicant_with_requested_position["total_items"] == 0:
+        return {
+            "status": "ERR: There is no applicant without vacancy or needed position name"
+        }
 
-    applicant_id = applicant_with_requested_position['items'][0]['id']
+    applicant_id = applicant_with_requested_position["items"][0]["id"]
 
     if created_vacancy_position != vacancy_position:
         return {"status": "ERR: Vacancy position is not equal applicant position"}
 
-    api_methods.add_applicant_to_vacancy(hf_api_url, account_id, applicant_id, vacancy_id,
-                                         start_vacancy_status_id, headers)
+    api_methods.add_applicant_to_vacancy(
+        hf_api_url,
+        account_id,
+        applicant_id,
+        vacancy_id,
+        start_vacancy_status_id,
+        headers,
+    )
 
     return {"status": "OK"}
 
@@ -73,16 +81,24 @@ async def applicant(request: Request):
     if hf_applicant_status != hired_account_status_id or not hf_applicant_status:
         return {"status": "ERR: Status not a hired"}
 
-    applicant_tags = api_methods.get_applicant_tags(hf_api_url, account_id, applicant_id, headers)["tags"]
+    applicant_tags = api_methods.get_applicant_tags(
+        hf_api_url, account_id, applicant_id, headers
+    )["tags"]
     account_tags = api_methods.get_account_tags(hf_api_url, account_id, headers)
     hired_tag_id = api_methods.find_tag_name_in_account_tags(account_tags, tag_name)
 
-    if not api_methods.find_tag_name_in_account_tags(account_tags, tag_name):
-        hired_tag_id = api_methods.create_tag(hf_api_url, account_id, tag_name, tag_color, headers)["id"]
+    pprint(applicant_tags)
+
+    if not hired_tag_id:
+        hired_tag_id = api_methods.create_tag(
+            hf_api_url, account_id, tag_name, tag_color, headers
+        )["id"]
 
     if hired_tag_id not in applicant_tags:
         applicant_tags.append(hired_tag_id)
 
-    api_methods.update_applicant_tags(hf_api_url, account_id, applicant_id, applicant_tags, headers)
+    api_methods.update_applicant_tags(
+        hf_api_url, account_id, applicant_id, applicant_tags, headers
+    )
 
     return {"status": "OK"}

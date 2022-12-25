@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Dict, Union, List
 from pprint import pprint
 
 import requests
@@ -12,9 +13,9 @@ def add_applicant_to_vacancy(
     applicant_id: str,
     vacancy_id: int,
     vacancy_status_id: str,
-    headers: dict,
+    headers: Dict[str, str],
 ) -> dict:
-    payload = {
+    payload: Dict[Union[int, str]] = {
         "vacancy": vacancy_id,
         "status": vacancy_status_id,
     }
@@ -29,7 +30,7 @@ def add_applicant_to_vacancy(
 
 
 def search_applicants_with_position(
-    api_url: str, org_id: str, applicant_position_name: str, headers: dict
+    api_url: str, org_id: str, applicant_position_name: str, headers: Dict[str, str]
 ) -> dict:
     params = {
         "q": applicant_position_name,
@@ -48,9 +49,9 @@ def search_applicants_with_position(
 
 
 def update_applicant_tags(
-    api_url: str, org_id: str, applicant_id: int, applicant_tags: list, headers: dict
+    api_url: str, org_id: str, applicant_id: int, applicant_tags: list, headers: Dict[str, str]
 ) -> int:
-    payload = {"tags": applicant_tags}
+    payload: Dict[str, List[int]] = {"tags": applicant_tags}
     response = requests.post(
         f"{api_url}/v2/accounts/{org_id}/applicants/{applicant_id}/tags",
         headers=headers,
@@ -62,7 +63,7 @@ def update_applicant_tags(
 
 
 def get_applicant_tags(
-    api_url: str, org_id: str, applicant_id: int, headers: dict
+    api_url: str, org_id: str, applicant_id: int, headers: Dict[str, str]
 ) -> dict:
     response = requests.get(
         f"{api_url}/v2/accounts/{org_id}/applicants/{applicant_id}/tags",
@@ -78,7 +79,7 @@ def create_tag(
     org_id: str,
     tag_name: str,
     color: str,
-    headers: dict,
+    headers: Dict[str, str],
 ) -> dict:
     payload = {
         "name": tag_name,
@@ -92,14 +93,14 @@ def create_tag(
     return response.json()
 
 
-def get_account_tags(api_url: str, org_id: str, headers: dict) -> dict:
+def get_account_tags(api_url: str, org_id: str, headers: Dict[str, str]) -> dict:
     response = requests.get(f"{api_url}/v2/accounts/{org_id}/tags", headers=headers)
     response.raise_for_status()
 
     return response.json()
 
 
-def get_account_vacancies_statuses(api_url: str, org_id: str, headers: dict) -> dict:
+def get_account_vacancies_statuses(api_url: str, org_id: str, headers: Dict[str, str]) -> dict:
     response = requests.get(
         f"{api_url}/v2/accounts/{org_id}/vacancies/statuses", headers=headers
     )
@@ -108,14 +109,14 @@ def get_account_vacancies_statuses(api_url: str, org_id: str, headers: dict) -> 
     return response.json()
 
 
-def get_accounts(api_url: str, headers: dict) -> dict:
+def get_accounts(api_url: str, headers: Dict[str, str]) -> dict:
     response = requests.get(f"{api_url}/v2/accounts", headers=headers)
     response.raise_for_status()
 
     return response.json()
 
 
-def find_tag_name_in_account_tags(account_tags: dict, account_tag_name: str):
+def find_tag_name_in_account_tags(account_tags: dict, account_tag_name: str) -> Union[int, None]:
     tag_id = None
     for account_tag in account_tags["items"]:
         if account_tag_name in account_tag.values():
