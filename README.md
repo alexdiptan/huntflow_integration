@@ -41,7 +41,7 @@ mv config/.env_template config/.env
 ## Запуск приложения
 Для запуска приложения нужно выполнить команду:
 ```
-python main.py
+uvicorn main:app --reload
 ```
 
 ## Дополнительные настройки в Хантфлоу
