@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from pprint import pprint
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
@@ -86,8 +85,6 @@ async def applicant(request: Request):
     )["tags"]
     account_tags = api_methods.get_account_tags(hf_api_url, account_id, headers)
     hired_tag_id = api_methods.find_tag_name_in_account_tags(account_tags, tag_name)
-
-    pprint(applicant_tags)
 
     if not hired_tag_id:
         hired_tag_id = api_methods.create_tag(
