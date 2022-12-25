@@ -130,27 +130,16 @@ def main():
     if Path.exists(dot_env_path):
         load_dotenv(dot_env_path)
 
-    load_dotenv(dot_env_path)
-
     hf_token = os.environ["HF_API_TOKEN"]
     hf_api_url = os.environ["HF_API_URL"]
     org_id = os.environ["ORG_ID"]
-    vacancy_position = os.environ["VACANCY_POSITION"]
-    start_vacancy_status_id = os.environ["START_VACANCY_STATUS_ID"]
+
     headers = {"Authorization": f"Bearer {hf_token}"}
 
     accounts_by_token = get_accounts(hf_api_url, headers)
     account_vacancy_statuses = get_account_vacancies_statuses(
         hf_api_url, org_id, headers
     )
-    # ---------------------------------------------------------------------------------------------------------------
-    applicants_with_requested_position = search_applicants_with_position(
-        hf_api_url, org_id, vacancy_position, headers
-    )
-    pprint(applicants_with_requested_position)
-    # if applicants_with_requested_position['total_items'] > 0:
-    #     applicant_id = applicants_with_requested_position['items'][0]['id']
-    #     pprint(add_applicant_to_vacancy(hf_api_url, org_id, applicant_id, 163, start_vacancy_status_id, headers))
 
 
 if __name__ == "__main__":
