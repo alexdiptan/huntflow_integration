@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from typing import Dict, Union, List
-from pprint import pprint
 
 import requests
 from dotenv import load_dotenv
